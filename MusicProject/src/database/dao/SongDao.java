@@ -8,12 +8,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 import database.ChinookDatabase;
+import model.Album;
 import model.Genre;
 import model.MediaType;
+import model.Song;
 
 public class SongDao {
 	
 	private ChinookDatabase db = new ChinookDatabase();
+	
+	public Song getSong(long songId) {
+		
+		Connection conn = db.connect();
+        PreparedStatement getSong = null;
+        ResultSet results = null;
+        
+        try {
+        	getSong = conn.prepareStatement("SELECT TrackId, Name, MediaTypeId, GenreId, Milliseconds FROM Track WHERE TrackId = ?");
+        	getSong.setLong(1, songId);
+        	results = getSong.executeQuery();
+        	if(results.next()){
+        		String name = results.getString("Name"),
+            			genre = getGenre(results.getLong("GenreId")),
+            			mediaType = getMediaType(results.getLong("MediaTypeId"));
+            		long trackId = results.getLong("TrackId"),
+        				songLength = results.getLong("Milliseconds");
+            		return new Song(trackId, name, genre, mediaType, songLength);
+        	} else {
+        		return null;
+        	}
+        } catch (SQLException e) {
+        	throw new RuntimeException(e);
+        } finally {
+        	db.close(results, getSong, conn);
+        }
+ 
+	}
 	
 	public List<Genre> getGenres() {
 		Connection conn = db.connect();

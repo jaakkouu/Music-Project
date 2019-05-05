@@ -26,11 +26,7 @@
 			            <td><a href="album/${album.id}"><c:out value="${album.name}" /></a></td>
 			            <td><c:out value="${album.songCount}" /></td>
 			            <td align="center">   
-		            		<form style="display: inline-block;" method="post" action="album/modify">
-       							<input type="hidden" name="artistId" value="<c:out value="${artist.id}" />" />
-       							<input type="hidden" name="albumId" value="<c:out value="${album.id}" />" />
-       							<button type="submit" class="btn yellow"><i class="far fa-edit fa-fx"></i> Edit</button>
-    						</form>
+			            	<button class="btn yellow" onclick="window.location.href = 'album/modify/<c:out value="${album.id}" />';"><i class="fas fa-edit fa-fx"></i> Modify</button>
       						<form style="display: inline-block;" method="post" action="album/delete">
         						<input type="hidden" name="artistId" value="<c:out value="${artist.id}" />" />
         						<input type="hidden" name="albumId" value="<c:out value="${album.id}" />" />

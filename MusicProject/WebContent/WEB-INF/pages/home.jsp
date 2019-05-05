@@ -4,7 +4,6 @@
 	<jsp:param name="pageTitle" value="Music Catalog" />
 	<jsp:param name="pageSubtitle" value="All ${size} artists (showing 25):" />
 </jsp:include>    
-
 			<table class="artists">
 				<thead>
 					<tr>
@@ -28,7 +27,6 @@
 		
        		<form style="margin-top: 20px" method="post" action="artist/create">
         		<input type="hidden" name="artistId" value="<c:out value="${artist.id}" />" />
-        		<span>Create Another Artist</span>
         		<input type="text" placeholder="Type artist name" name="title" required>
         		<button type="submit"><i class="fas fa-plus fa-fx"></i> Create</button>
         	</form>
