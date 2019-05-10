@@ -1,6 +1,7 @@
 package controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -14,6 +15,7 @@ import database.dao.AlbumDao;
 import database.dao.ArtistsDao;
 import database.dao.SongDao;
 import model.Album;
+import model.Artist;
 import model.Genre;
 import model.MediaType;
 import model.Song;
@@ -35,11 +37,15 @@ public class AlbumServlet extends HttpServlet {
 
 	@Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		
 		long albumId = Long.parseLong(request.getPathInfo().replace("/", ""));
 		
 		Album album = albumDao.getAlbum(albumId);
 		
+		
 		if(album != null) {
+			Artist artist = artistsDao.getArtist(album.getArtistId());
+			request.setAttribute("artist", artist.getName());
 			request.setAttribute("album", album);
 			List<Song> songs = albumDao.getSongs(albumId);
 			
@@ -53,6 +59,14 @@ public class AlbumServlet extends HttpServlet {
     	
     	List<MediaType> mediaTypes = songDao.getMediaTypes();
     	request.setAttribute("mediaTypes", mediaTypes);
+    	
+		List<String> breadcrumb = new ArrayList<>();
+		
+		breadcrumb.add("<a href='#'>All Artists</a>");
+		breadcrumb.add("<a href='"+ request.getRequestURL() +"'>" + album.getName() + "</a>");
+		
+	
+		request.setAttribute("breadcrumb", breadcrumb);
 		
 		request.getRequestDispatcher("/WEB-INF/pages/album.jsp").forward(request, response);
     }	
@@ -73,7 +87,6 @@ public class AlbumServlet extends HttpServlet {
 			long albumId = Long.parseLong(request.getParameter("albumId"));
 			boolean albumExists = artistsDao.albumExists(artistId, albumId);
 			if (albumExists) {
-				System.out.println("Album found, removing album");
 				albumDao.removeAlbum(artistId, albumId);
 			}
 			response.sendRedirect(request.getContextPath()+"/artist/"+artistId);

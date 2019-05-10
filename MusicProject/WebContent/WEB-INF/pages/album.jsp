@@ -1,13 +1,10 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<jsp:include page="/WEB-INF/inc/header.jsp" />  
-        	<div class="breadcrumb">
-        		<a href="${pageContext.request.contextPath}/">All artists</a> /
-        		<a href="#"><c:out value="${artist.name}" /></a> /
-        		<span><c:out value="${album.name}" /></span>
-        	</div>
-        	<h1 class="pageTitle"><c:out value="${album.name}" /></h1>
-        	<h2 class="pageSubtitle">Artist name</h2>
+<jsp:include page="/WEB-INF/inc/header.jsp">
+	<jsp:param name="pageTitle" value="${album.name}" />
+	<jsp:param name="pageSubtitle" value="by ${artist}" />
+	<jsp:param name="breadcrumb" value="${breadcrumb}" />
+</jsp:include>
       		<% if(request.getAttribute("songs") != null) { %> 
       		<h3>Tracks:</h3>
     		<table class="tracks">
@@ -22,22 +19,14 @@
 					</tr>
 				</thead>
 			    <c:forEach items="${songs}" var="song" varStatus="loop">
-			    	
 			    		<tr>
-			    	
-
 			        	<td><c:out value="${loop.count}" />.</td>
-			            <%--<td><a href="song/${song.id}"><c:out value="${song.name}" /></a></td>--%>
 			            <td><c:out value="${song.name}" /></td>
 			            <td><c:out value="${song.genre}" /></td>
 			            <td><c:out value="${song.mediaType}" /></td>
 			            <td><c:out value="${song.songLength}" /></td>
 			            <td align="center">
-			            	<form style="display: inline-block" method="post" action="song/modify">
-       							<input type="hidden" name="songId" value="<c:out value="${song.id}" />" />
-       							<input type="hidden" name="albumId" value="<c:out value="${album.id}" />" />
-       							<button type="submit" class="btn yellow"><i class="far fa-edit fa-fx"></i> Edit</button>
-    						</form>
+			            	<button class="btn yellow" onclick="window.location.href = 'song/modify/<c:out value="${song.id}" />';"><i class="fas fa-edit fa-fx"></i> Modify</button>
       						<form style="display: inline-block" method="post" action="song/delete">
         						<input type="hidden" name="songId" value="<c:out value="${song.id}" />" />
         						<input type="hidden" name="albumId" value="<c:out value="${album.id}" />" />

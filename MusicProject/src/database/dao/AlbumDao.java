@@ -23,11 +23,12 @@ public class AlbumDao {
         ResultSet resultSet = null;
         
         try {
-        	getAlbum = conn.prepareStatement("SELECT AlbumId, Title FROM Album WHERE AlbumId = ?");
+        	getAlbum = conn.prepareStatement("SELECT AlbumId, ArtistId, Title FROM Album WHERE AlbumId = ?");
         	getAlbum.setLong(1, albumId);
         	resultSet = getAlbum.executeQuery();
         	if(resultSet.next()){
         		Album a = new Album(resultSet.getLong("AlbumId"), resultSet.getString("Title"));
+        		a.setArtistId(resultSet.getLong("ArtistId"));
         		return a;
         	} else {
         		return null;

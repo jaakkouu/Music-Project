@@ -1,14 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<jsp:include page="/WEB-INF/inc/header.jsp" />  
-      
-        	<div class="breadcrumb">
-        		<a href="${pageContext.request.contextPath}/">All artists</a> /
-        		<span><c:out value="${artist.name}" /></span>
-        	</div>
-        	
-        	<h1 class="pageTitle"><c:out value="${artist.name}" /></h1>        	
-        	
+<jsp:include page="/WEB-INF/inc/header.jsp">
+	<jsp:param name="pageTitle" value="${artist.name}" />
+	<jsp:param name="breadcrumb" value="${breadcrumb}" />
+</jsp:include> 
         	<% if(request.getAttribute("albums") != null) { %>
         	<h3>Albums:</h3>
     		<table class="albums">
@@ -50,5 +45,7 @@
         		<input type="hidden" name="artistId" value="<c:out value="${artist.id}" />" />
         		<button type="submit" class="roundbtn favorite"><i class="far fa-star"></i></button>
         	</form>
+        	
+        	<button class="roundbtn modify" onclick="window.location.href = 'artist/modify/<c:out value="${artist.id}" />';"><i class="far fa-edit"></i></button>
         	
 <jsp:include page="/WEB-INF/inc/footer.jsp" />  

@@ -15,6 +15,27 @@ public class ArtistsDao {
 	
 	private ChinookDatabase db = new ChinookDatabase();
 	
+	public int createArtist(String artistName) {
+			
+			Connection conn = db.connect();
+	        PreparedStatement createArtist = null;
+	        ResultSet keys = null;
+	        
+	        try {
+	        	createArtist = conn.prepareStatement("INSERT INTO Artist (Name) VALUES (?)");
+	        	createArtist.setString(1, artistName);	
+	        	createArtist.executeUpdate();
+	        	keys = createArtist.getGeneratedKeys();
+	        	keys.next();
+	        	return keys.getInt(1);
+	        } catch (SQLException e) {
+	        	throw new RuntimeException(e);
+	        } finally {
+	        	db.close(keys, createArtist, conn);
+	        }
+			
+	}
+	
 	public Artist getArtist(long artistId) {
 		Connection conn = db.connect();
 		PreparedStatement getArtist = null;

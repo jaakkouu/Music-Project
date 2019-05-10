@@ -30,10 +30,5 @@ public class HomeServlet extends HttpServlet {
 		request.setAttribute("size", artists.size());
 		request.getRequestDispatcher("/WEB-INF/pages/home.jsp").forward(request, response);
     }
-	 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	
-    }
-    
+	     
 }

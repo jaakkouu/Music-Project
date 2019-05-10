@@ -4,6 +4,7 @@
 <html>
 	<head>
 		<base href="${pageContext.request.contextPath}/" />
+		<meta name="viewport" content="user-scalable=no, initial-scale=1.0, maximum-scale=1.0" charset="UTF-8">
 		<title><%= request.getParameter("pageTitle") != null ? request.getParameter("pageTitle") + " | " : "" %>Music Pro</title>       
 		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 		<link rel="stylesheet" type="text/css" href="${pageContext.request.contextPath}/assets/css/style.css" />
@@ -19,5 +20,11 @@
             </nav>
         </header>
         <main> 
+        
+			<% if(request.getParameter("breadcrumb") != null) { %> 
+			<div class='breadcrumb'>
+				<%= String.join("/", request.getParameter("breadcrumb")) %> 
+			</div>
+			<% } %>
      		<%= request.getParameter("pageTitle") != null ? "<h1 class='pageTitle'>" + request.getParameter("pageTitle") + "</h1>" : "" %>       
 	        <%= request.getParameter("pageSubtitle") != null ? "<h2 class='pageSubtitle'>" + request.getParameter("pageSubtitle") + "</h2>" : "" %>

@@ -23,10 +23,9 @@
 			    </tbody>
 			</table>
 			
-			<p id="loadMore" style="text-align: center">Show more</p>
+			<p id="loadMore" style="text-align: center; cursor: pointer">Show 25 more</p>
 		
        		<form style="margin-top: 20px" method="post" action="artist/create">
-        		<input type="hidden" name="artistId" value="<c:out value="${artist.id}" />" />
         		<input type="text" placeholder="Type artist name" name="title" required>
         		<button type="submit"><i class="fas fa-plus fa-fx"></i> Create</button>
         	</form>

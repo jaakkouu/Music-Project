@@ -1,6 +1,7 @@
 package controller;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -28,9 +29,8 @@ public class ArtistServlet extends HttpServlet {
     }
 
 	@Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {	
 		
-	
 		long artistId = Long.parseLong(request.getPathInfo().replace("/", ""));
 				
 		Artist artist = artistsDao.getArtist(artistId);
@@ -40,7 +40,14 @@ public class ArtistServlet extends HttpServlet {
 			request.setAttribute("albums", albums);
 		}
 		
-		request.setAttribute("artist", artist);	
+		List<String> breadcrumb = new ArrayList<>();
+		
+		breadcrumb.add("<a href='#'>All Artists</a>");
+		breadcrumb.add("<a href='"+ request.getRequestURL() +"'>" + artist.getName() + "</a>");
+		
+		request.setAttribute("artist", artist);
+		request.setAttribute("breadcrumb", breadcrumb);
+		
 		request.getRequestDispatcher("/WEB-INF/pages/artist.jsp").forward(request, response);
 		
     }
@@ -49,6 +56,12 @@ public class ArtistServlet extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException  {
 		
 		String postAction = request.getPathInfo().replace("/", "");
+		
+		if (postAction.equals("create")) {
+			String title = request.getParameter("title");
+			int artistId = artistsDao.createArtist(title);
+			response.sendRedirect(request.getContextPath()+"/artist/"+artistId);
+		}
 		/*
 		
 		if (postAction.equals("favorite")) {

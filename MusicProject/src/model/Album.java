@@ -2,9 +2,10 @@ package model;
 
 public class Album {
 	
-	private long id;
+	private long id,
+			artistId,
+			songCount;
 	private String name;
-	private long songCount;
 	
 	public Album(long id, String name) {
 		this.id = id;
@@ -33,6 +34,14 @@ public class Album {
 
 	public void setSongCount(long songCount) {
 		this.songCount = songCount;
+	}
+
+	public void setArtistId(long artistId) {
+		this.artistId = artistId;
+	}
+	
+	public long getArtistId() {
+		return this.artistId;
 	}
 
 }
