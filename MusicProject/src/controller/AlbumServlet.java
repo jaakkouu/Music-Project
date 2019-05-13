@@ -14,6 +14,7 @@ import javax.servlet.http.HttpSession;
 import database.dao.AlbumDao;
 import database.dao.ArtistsDao;
 import database.dao.SongDao;
+import helpers.Breadcrumb;
 import model.Album;
 import model.Artist;
 import model.Genre;
@@ -41,8 +42,7 @@ public class AlbumServlet extends HttpServlet {
 		long albumId = Long.parseLong(request.getPathInfo().replace("/", ""));
 		
 		Album album = albumDao.getAlbum(albumId);
-		
-		
+	
 		if(album != null) {
 			Artist artist = artistsDao.getArtist(album.getArtistId());
 			request.setAttribute("artist", artist.getName());
@@ -52,23 +52,25 @@ public class AlbumServlet extends HttpServlet {
 			if(songs.size() > 0) {
 				request.setAttribute("songs", songs);
 			}	
+			
+		 	List<Genre> genres = songDao.getGenres();
+	    	request.setAttribute("genres", genres);
+	    	
+	    	List<MediaType> mediaTypes = songDao.getMediaTypes();
+	    	request.setAttribute("mediaTypes", mediaTypes);
+	    	
+	    	
+	    	Breadcrumb breadcrumb = new Breadcrumb();
+	    	breadcrumb.setItem("link", "", "All Artists");
+	    	breadcrumb.setItem("link", "artist/"+artist.getId(), artist.getName());
+	    	breadcrumb.setItem("text", "", album.getName());
+	    	
+			request.setAttribute("breadcrumb", String.join(" / ", breadcrumb.getBreadcrumb()));
+			
+			request.getRequestDispatcher("/WEB-INF/pages/album.jsp").forward(request, response);
 		}
 		
-	 	List<Genre> genres = songDao.getGenres();
-    	request.setAttribute("genres", genres);
-    	
-    	List<MediaType> mediaTypes = songDao.getMediaTypes();
-    	request.setAttribute("mediaTypes", mediaTypes);
-    	
-		List<String> breadcrumb = new ArrayList<>();
-		
-		breadcrumb.add("<a href='#'>All Artists</a>");
-		breadcrumb.add("<a href='"+ request.getRequestURL() +"'>" + album.getName() + "</a>");
-		
 	
-		request.setAttribute("breadcrumb", breadcrumb);
-		
-		request.getRequestDispatcher("/WEB-INF/pages/album.jsp").forward(request, response);
     }	
 	
 	@Override

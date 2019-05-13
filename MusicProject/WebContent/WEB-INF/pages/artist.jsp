@@ -2,7 +2,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <jsp:include page="/WEB-INF/inc/header.jsp">
 	<jsp:param name="pageTitle" value="${artist.name}" />
-	<jsp:param name="breadcrumb" value="${breadcrumb}" />
 </jsp:include> 
         	<% if(request.getAttribute("albums") != null) { %>
         	<h3>Albums:</h3>

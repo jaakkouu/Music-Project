@@ -3,7 +3,6 @@
 <jsp:include page="/WEB-INF/inc/header.jsp">
 	<jsp:param name="pageTitle" value="${album.name}" />
 	<jsp:param name="pageSubtitle" value="by ${artist}" />
-	<jsp:param name="breadcrumb" value="${breadcrumb}" />
 </jsp:include>
       		<% if(request.getAttribute("songs") != null) { %> 
       		<h3>Tracks:</h3>
@@ -41,9 +40,9 @@
 				<p style="margin-bottom: 16px">No songs added yet</p>
 			<% } %>
 		
-			<button id="openNewSong">Add New Song <i class="fas fa-chevron-right fa-fx" style="width: 18px"></i></button>
+			<button id="openNewSong">Add New Song</button>
 			
-			<div id="songWrapperElement" style="margin-top: 24px; display: none">
+			<div id="songWrapperElement">
 			
 				<h3>Add song to this album</h3>
 			
@@ -95,14 +94,18 @@
         	</div>
         	
         	<script>
-			
-				$(() => {
-					$('#openNewSong').on('click', function() {
-						$(this).find("i").toggleClass("fa-chevron-right fa-chevron-down");
-						$('#songWrapperElement').slideToggle();
-					});
-				});
-		
+        	
+        		let newSong = document.getElementById("openNewSong"),
+        			songWrapperElement = document.getElementById("songWrapperElement");
+        		
+        		newSong.addEventListener("click", (e) => {
+        			
+        			if(songWrapperElement.classList) {
+        				songWrapperElement.classList.toggle("show");
+        			}
+        				
+        		});
+
 			</script>
         	
 <jsp:include page="/WEB-INF/inc/footer.jsp" />    

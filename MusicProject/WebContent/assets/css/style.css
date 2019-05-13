@@ -97,7 +97,7 @@ main {
     width: 100%;
     max-width: 1200px;
     padding: 30px 30px 15px 30px;
-    margin: 100px auto 50px auto;
+    margin: 0 auto 50px auto;
     position: relative;
     box-shadow: 0px 2px 2px rgba(0,0,0,0.1)
 }
@@ -208,13 +208,22 @@ table tr td .btn {
 }
 
 .breadcrumb {
-	padding: 0 0 10px 0;
 	font-size: 15px;
-	color: #555555;
+    color: #555555;
+    background-color: #ececec;
+    width: 100%;
+    max-width: 1200px;
+    padding: 15px 30px;
+    margin: 80px auto 15px;
 }
 
 .breadcrumb a {
+	color: blue;
 	text-decoration: none
+}
+
+.breadcrumb a:visited {
+	color: blue
 }
 
 .breadcrumb span {
@@ -236,6 +245,15 @@ form.gridForm {
 form.gridForm div {
 	display: grid;
 	grid-row-gap: 4px
+}
+
+#songWrapperElement {
+	margin-top: 26px;
+	display: none;
+}
+
+#songWrapperElement.show {
+	display: block !important;
 }
 
 @media (max-width: 1200px) {

@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import database.dao.ArtistsDao;
+import helpers.Breadcrumb;
 import model.Album;
 import model.Artist;
 
@@ -35,20 +36,23 @@ public class ArtistServlet extends HttpServlet {
 				
 		Artist artist = artistsDao.getArtist(artistId);
 		
-		if(artist.getAlbumCount() > 0) {
-			List<Album> albums = artistsDao.getAlbums(artistId);
-			request.setAttribute("albums", albums);
+		if(artist != null) {
+			if(artist.getAlbumCount() > 0) {
+				List<Album> albums = artistsDao.getAlbums(artistId);
+				request.setAttribute("albums", albums);
+			}
+			
+			Breadcrumb breadcrumb = new Breadcrumb();
+	    	breadcrumb.setItem("link", "", "All Artists");
+	    	breadcrumb.setItem("text", "", artist.getName());
+	    	
+			request.setAttribute("breadcrumb", String.join(" / ", breadcrumb.getBreadcrumb()));
+		
+			request.setAttribute("artist", artist);
+				
+			request.getRequestDispatcher("/WEB-INF/pages/artist.jsp").forward(request, response);
 		}
 		
-		List<String> breadcrumb = new ArrayList<>();
-		
-		breadcrumb.add("<a href='#'>All Artists</a>");
-		breadcrumb.add("<a href='"+ request.getRequestURL() +"'>" + artist.getName() + "</a>");
-		
-		request.setAttribute("artist", artist);
-		request.setAttribute("breadcrumb", breadcrumb);
-		
-		request.getRequestDispatcher("/WEB-INF/pages/artist.jsp").forward(request, response);
 		
     }
 	

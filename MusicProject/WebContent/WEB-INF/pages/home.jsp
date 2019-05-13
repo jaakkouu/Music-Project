@@ -4,7 +4,7 @@
 	<jsp:param name="pageTitle" value="Music Catalog" />
 	<jsp:param name="pageSubtitle" value="All ${size} artists (showing 25):" />
 </jsp:include>    
-			<table class="artists">
+			<table class="artists" id="artists">
 				<thead>
 					<tr>
 						<th>#</th>
@@ -31,20 +31,25 @@
         	</form>
         	
         	<script>
-        	
-        		$(() => {
-        			let shownItems = 25;
-        			$("#loadMore").on("click", function() {
-        				shownItems = shownItems + 25;
-        				$("table.artists tr").each(function(index) {
-        					let $this = $(this);
-        					if(shownItems >= index) {
-        						$this.removeClass("hidden");
-        					}
-        				});
-        			});
-        		});
-        	
+
+        		let shownItems = 25,
+        			artists = document.getElementById("artists"),
+        			rows = artists.getElementsByTagName("tr").length,
+        			loadMore = document.getElementById("loadMore");
+        		
+    			loadMore.addEventListener("click", () => {
+    				if(shownItems >= rows) {
+    					loadMore.innerText = "No more results";
+    					return;
+    				}
+    				shownItems = shownItems + 50;
+    				for(let [i,row] of [...artists.rows].entries()) {
+    					if(shownItems >= i) {
+    						row.classList.remove("hidden");
+    					}
+    				}
+    			});
+    			
         	</script>
         
 <jsp:include page="/WEB-INF/inc/footer.jsp" />    
