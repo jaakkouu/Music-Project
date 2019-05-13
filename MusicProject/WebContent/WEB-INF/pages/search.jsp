@@ -8,7 +8,7 @@
 
 	        	<% if(request.getAttribute("artists") != null) { %>
 	        	
-	        	<table class="artists">
+	        	<table id="artists" class="artists">
 					<thead>
 						<tr>
 							<th>#</th>
@@ -16,12 +16,14 @@
 						</tr>
 					</thead>
 				    <c:forEach items="${artists}" var="artist" varStatus="loop">
-				        <tr>
+				        <tr <c:if test="${loop.count > 25}">class="hidden"</c:if>>
 				        	<td><c:out value="${loop.count}" />.</td>
 				            <td><a href="artist/${artist.id}"><c:out value="${artist.name}" /></a></td>
 				        </tr>
 				    </c:forEach>
 				</table>
+				
+				<p id="loadMore" style="text-align: center; cursor: pointer">Show more</p>
 				
 				<% } else { %>
 				
@@ -35,4 +37,5 @@
        			<input placeholder="Type artist's name" name="search" type="text">
        			<button type="submit"><i class="fas fa-search fa-fx"></i> Search</button>
         	</form>	
+  	
 <jsp:include page="/WEB-INF/inc/footer.jsp" />    

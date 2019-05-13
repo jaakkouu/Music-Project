@@ -5,10 +5,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import database.ChinookDatabase;
-import model.Album;
 import model.Genre;
 import model.MediaType;
 import model.Song;
@@ -24,16 +25,17 @@ public class SongDao {
         ResultSet results = null;
         
         try {
-        	getSong = conn.prepareStatement("SELECT TrackId, Name, MediaTypeId, GenreId, Milliseconds FROM Track WHERE TrackId = ?");
+        	getSong = conn.prepareStatement("SELECT TrackId, Name, MediaTypeId, GenreId, Milliseconds, UnitPrice FROM Track WHERE TrackId = ?");
         	getSong.setLong(1, songId);
         	results = getSong.executeQuery();
         	if(results.next()){
         		String name = results.getString("Name"),
-            			genre = getGenre(results.getLong("GenreId")),
-            			mediaType = getMediaType(results.getLong("MediaTypeId"));
-            		long trackId = results.getLong("TrackId"),
-        				songLength = results.getLong("Milliseconds");
-            		return new Song(trackId, name, genre, mediaType, songLength);
+    				unitPrice = results.getString("UnitPrice");
+            	Genre genre = getGenre(results.getLong("GenreId"));
+            	MediaType mediaType = getMediaType(results.getLong("MediaTypeId"));
+        		long trackId = results.getLong("TrackId"),
+    				songLength = results.getLong("Milliseconds");
+        		return new Song(trackId, name, genre, mediaType, songLength, unitPrice);
         	} else {
         		return null;
         	}
@@ -109,6 +111,90 @@ public class SongDao {
         
 	}
 	
+	
+	public int modifySong(long songId, String name, long genreId, long mediaTypeId, String seconds, String unitPrice) {
+		
+		
+		Connection conn = db.connect();
+        PreparedStatement modifySong = null;
+        ResultSet keys = null;
+        
+        // Get current song
+        Song song = getSong(songId);
+        
+        // Update only if changed data is different
+        String sql = "UPDATE Track SET";
+        
+        Map<String, List<String>> parameters = new HashMap();
+        
+        if(!song.getName().equals(name)) {
+        	List<String> a = new ArrayList<>();
+        	a.add("Name");
+        	a.add(name);
+        	parameters.put("String", a);
+        }
+        
+        if(song.getGenre().getId() != genreId) {
+        	List<String> a = new ArrayList<>();
+        	a.add("GenreId");
+        	a.add(Long.toString(genreId));
+        	parameters.put("Long", a);
+        }
+        
+        if(song.getMediaType().getId() != mediaTypeId) {
+        	List<String> a = new ArrayList<>();
+        	a.add("MediaTypeId");
+        	a.add(Long.toString(mediaTypeId));
+        	parameters.put("Long", a);
+        }
+        
+        if(!song.getSongLengthInSeconds().equals(seconds)) {
+        	List<String> a = new ArrayList<>();
+        	a.add("MilliSeconds");
+        	a.add(seconds);
+        	parameters.put("Long", a);
+        }
+        
+        if(!song.getUnitPrice().equals(unitPrice)) {
+        	List<String> a = new ArrayList<>();
+        	a.add("UnitPrice");
+        	a.add(unitPrice);
+        	parameters.put("String", a);
+        }
+        
+        for (Map.Entry<String, List<String>> p : parameters.entrySet()) {	
+        	sql = sql + " " + p.getValue().get(0) + " = ?,";
+        }
+        
+        if(sql.endsWith(",")){
+          sql = sql.substring(0, sql.length() - 1);
+        }
+        
+        try {
+        	modifySong = conn.prepareStatement(sql + "WHERE TrackId = ?"); 
+            int position = 1;
+            for (Map.Entry<String, List<String>> p : parameters.entrySet()) {	
+            	if(p.getKey().equals("String")) {
+            		modifySong.setString(position, p.getValue().get(1));
+            		System.out.println(position + " " + p.getValue().get(1));
+            	} else if (p.getKey().equals("Long")) {
+            		modifySong.setLong(position, Long.parseLong(p.getValue().get(1)));
+            		System.out.println(position + " " + Long.parseLong(p.getValue().get(1)));
+            	}
+            	position++;
+            }
+            modifySong.setLong(position, songId);
+            modifySong.executeUpdate();
+        	keys = modifySong.getGeneratedKeys();
+        	keys.next();
+     		return keys.getInt(1);
+        } catch (SQLException e) {
+        	throw new RuntimeException(e);
+        } finally {
+        	db.close(keys, modifySong, conn);
+        }           
+	}
+	
 	public boolean removeSong(long songId) {
 		Connection conn = db.connect();
         PreparedStatement removeSong = null;
@@ -126,7 +212,7 @@ public class SongDao {
 
 	}
 	
-	public String getGenre(long genreId) {
+	public Genre getGenre(long genreId) {
 		Connection conn = db.connect();
         PreparedStatement getGenre = null;
         ResultSet results = null;
@@ -135,10 +221,10 @@ public class SongDao {
         	getGenre.setLong(1, genreId);
         	results = getGenre.executeQuery();	
         	if(results.next()) {
-        		return results.getString("Name");
+        		return new Genre(genreId, results.getString("Name"));
         	} else {
-        		return "No Genre Defined";
-        	}	
+        		return null;
+        	}
         } catch (SQLException e) {
         	throw new RuntimeException(e);
         } finally {
@@ -146,7 +232,7 @@ public class SongDao {
         }
 	}
 
-	public String getMediaType(long mediaTypeId) {
+	public MediaType getMediaType(long mediaTypeId) {
 		Connection conn = db.connect();
         PreparedStatement getMediaType = null;
         ResultSet results = null;
@@ -155,9 +241,9 @@ public class SongDao {
         	getMediaType.setLong(1, mediaTypeId);
         	results = getMediaType.executeQuery();	
         	if(results.next()) {
-        		return results.getString("Name");
+        		return new MediaType(mediaTypeId, results.getString("Name"));
         	} else {
-        		return "No MediaType Defined";
+        		return null;
         	}
         } catch (SQLException e) {
         	throw new RuntimeException(e);

@@ -17,7 +17,7 @@ public class Breadcrumb {
 		breadcrumb.add(item);
 	}
 	
-	public List getBreadcrumb() {
+	public List<String> getBreadcrumb() {
 		return this.breadcrumb;
 	}
 

@@ -3,17 +3,20 @@ package model;
 public class Song {
 
     private long id;
-    private String name;
-    private String genre;
-    private String mediaType;
-    private String songLength;
-
-    public Song(long id, String name, String genre, String mediaType, long songLength) {
+    private String name,
+	    songLength,
+	    unitPrice;
+    
+    private MediaType mediaType;
+    private Genre genre;
+    
+    public Song(long id, String name, Genre genre, MediaType mediaType, long songLength, String UnitPrice) {
         this.setId(id);
         this.setName(name);
         this.setGenre(genre);
         this.setMediaType(mediaType);
         this.setSongLength(minutesAndSeconds(songLength));
+        this.setUnitPrice(UnitPrice);
     }
     
     private String minutesAndSeconds(long milliseconds) {
@@ -35,31 +38,38 @@ public class Song {
     }
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
 		this.name = name;
 	}
 
-	public String getGenre() {
+	public Genre getGenre() {
 		return genre;
 	}
-
-	public void setGenre(String genre) {
+	
+	public void setGenre(Genre genre) {
 		this.genre = genre;
 	}
 
-	public String getMediaType() {
+	public MediaType getMediaType() {
 		return mediaType;
 	}
 
-	public void setMediaType(String mediaType) {
+	public void setMediaType(MediaType mediaType) {
 		this.mediaType = mediaType;
 	}
 
 	public String getSongLength() {
-		return songLength;
+		return this.songLength;
+	}
+	
+	public String getSongLengthInSeconds() {
+		String[] minutesAndSeconds = this.songLength.split(":");
+		long minutes = Long.parseLong(minutesAndSeconds[0]) * 60;
+		long seconds = Long.parseLong(minutesAndSeconds[1]);
+		return Long.toString(minutes + seconds);
 	}
 
 	public void setSongLength(String songLength) {
@@ -67,11 +77,19 @@ public class Song {
 	}
 
 	public long getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(long id) {
 		this.id = id;
+	}
+	
+	public void setUnitPrice(String unitPrice) {
+		this.unitPrice = unitPrice;
+	}
+	
+	public String getUnitPrice() {
+		return this.unitPrice;
 	}
     
     

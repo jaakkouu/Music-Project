@@ -26,6 +26,7 @@ public class ModifyServlet extends HttpServlet {
 	private AlbumDao albumDao;
 	private ArtistsDao artistsDao;
 	private SongDao songDao;
+	private long requestedId;
 	
     @Override
     public void init() {
@@ -44,24 +45,18 @@ public class ModifyServlet extends HttpServlet {
 
 		List<Object> inputs = new ArrayList<>();
 		
-		long requestedId = Long.parseLong(request.getPathInfo().substring(1));
+		requestedId = Long.parseLong(request.getPathInfo().substring(1));
 		
 		if (servletPath.equals("/album/modify")) {	
-			Album album = albumDao.getAlbum(requestedId);
 			formActionUrl = "album/modify";
 			inputs = getInputs("album");
-			
 		} else if (servletPath.equals("/artist/modify")) {
-			Artist artist = artistsDao.getArtist(requestedId);
 			formActionUrl = "artist/modify";
 			inputs = getInputs("artist");
-			
 		} else if (servletPath.equals("/song/modify")) {
-			Song song = songDao.getSong(requestedId);
 			formActionUrl = "song/modify";
 			inputs = getInputs("song");
 		}
-		
 		
 		request.setAttribute("requestedId", requestedId);
 		request.setAttribute("formActionUrl", formActionUrl);
@@ -82,6 +77,18 @@ public class ModifyServlet extends HttpServlet {
 	
 		} else if (servletPath.equals("/song/modify")) {
 			
+			String name = request.getParameter("title"),
+					unitPrice = request.getParameter("price"),
+					seconds = request.getParameter("length");
+
+			long songId = Long.parseLong(request.getParameter("requestedId")),
+				genreId = Long.parseLong(request.getParameter("genre")),
+				mediaTypeId = Long.parseLong(request.getParameter("mediatype"));
+			
+			songId = songDao.modifySong(songId, name, genreId, mediaTypeId, seconds, unitPrice);
+			
+			// Redirect doesnt work properly
+			response.sendRedirect(request.getContextPath()+"/song/"+songId);
 		}
     }
     
@@ -213,19 +220,23 @@ public class ModifyServlet extends HttpServlet {
 			public String toString() {
     			String html = "<div>";
     			html += getLabelText() != "" ? "<label for='"+getId()+"'>" + getLabelText() + "</label>" : "";
-    			html += "<select name='"+getName()+"' id='"+getId()+"'>";    			
-				html += "<option selected disabled>"+getPlaceholder()+"</option>";
-			
-				// much cleaning to do
+    			html += "<select name='"+getName()+"' id='"+getId()+"'>";   
+    					
 				if(getName().equals("mediatype")) {
 			    	List<MediaType> mediaTypes = songDao.getMediaTypes();
 			    	for(MediaType type : mediaTypes) {
-						html += "<option value='"+type.getId()+"'>"+ type.getName() +"</option>";
+						html += "<option value='"+type.getId()+"'";
+						html += type.getName().equals(this.getInitialValue()) ? " selected>" : ">"; 
+						html += type.getName(); 
+						html += "</option>";
 					}
 				} else if (getName().equals("genre")) {
 					List<Genre> genres = songDao.getGenres();
 					for(Genre genre : genres) {
-						html += "<option value='"+genre.getId()+"'>"+ genre.getName() +"</option>";
+						html += "<option value='"+genre.getId()+"'";
+						html += genre.getName().equals(this.getInitialValue()) ? " selected>" : ">"; 
+						html += genre.getName(); 
+						html += "</option>";
 					}
 				}
 				
@@ -240,18 +251,20 @@ public class ModifyServlet extends HttpServlet {
     	switch(requestedForm) {
     	
     		case "album":
-    	    	inputs.add(new Input("text", "title", "title", "", "Type a new album name", "Album Name"));
+    			Album album = albumDao.getAlbum(requestedId);
+    	    	inputs.add(new Input("text", "title", "title", album.getName(), "Type a new album name", "Album Name"));
     			break;
     		case "artist":
-    			inputs.add(new Input("text", "title", "title", "", "Type a new artist name", "Artist Name"));
+    			Artist artist = artistsDao.getArtist(requestedId);
+    			inputs.add(new Input("text", "title", "title", artist.getName(), "Type a new artist name", "Artist Name"));
     			break;
     		case "song":
-    			
-    			Input name = new Input("text", "title", "title", "", "Type a new song name", "Song Name");
-    			Select genre = new Select("genre", "genre", "", "Select a new genre name", "Genre");
-    			Select mediaType = new Select("mediatype", "mediatype", "", "Select a new media type", "Media Format");
-    			Input length = new Input("text", "length", "length", "", "Type a new length it seconds", "Length In Seconds");
-    			Input unitPrice = new Input("text", "price", "price", "", "Type a new unit price", "Unit Price");
+    			Song song = songDao.getSong(requestedId);
+    			Input name = new Input("text", "title", "title", song.getName(), "Type a new song name", "Song Name");
+    			Select genre = new Select("genre", "genre", song.getGenre().getName(), "Select a new genre name", "Genre");
+    			Select mediaType = new Select("mediatype", "mediatype", song.getMediaType().getName(), "Select a new media type", "Media Format");
+    			Input length = new Input("text", "length", "length", song.getSongLengthInSeconds(), "Type a new length it seconds", "Length In Seconds");
+    			Input unitPrice = new Input("text", "price", "price", song.getUnitPrice(), "Type a new unit price (#.##)", "Unit Price");
     			
     			unitPrice.setPattern("\\d+(\\.\\d{2})?");
     			

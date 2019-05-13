@@ -14,6 +14,7 @@
 						<th align="left">Genre</th>
 						<th align="left">MediaType</th>
 						<th align="left">Length</th>
+						<th align="left">Unit Price</th>
 						<th></th>
 					</tr>
 				</thead>
@@ -21,9 +22,10 @@
 			    		<tr>
 			        	<td><c:out value="${loop.count}" />.</td>
 			            <td><c:out value="${song.name}" /></td>
-			            <td><c:out value="${song.genre}" /></td>
-			            <td><c:out value="${song.mediaType}" /></td>
+			            <td><c:out value="${song.genre.name}" /></td>
+			            <td><c:out value="${song.mediaType.name}" /></td>
 			            <td><c:out value="${song.songLength}" /></td>
+			            <td><c:out value="${song.unitPrice}" />$</td>
 			            <td align="center">
 			            	<button class="btn yellow" onclick="window.location.href = 'song/modify/<c:out value="${song.id}" />';"><i class="fas fa-edit fa-fx"></i> Modify</button>
       						<form style="display: inline-block" method="post" action="song/delete">

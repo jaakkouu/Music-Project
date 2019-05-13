@@ -4,12 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 import database.ChinookDatabase;
 import model.Album;
+import model.Genre;
+import model.MediaType;
 import model.Song;
 
 public class AlbumDao {
@@ -48,17 +49,17 @@ public class AlbumDao {
         List<Song> songs = new ArrayList<Song>();
         SongDao songDao = new SongDao();
         try {
-        	getSongs = conn.prepareStatement("SELECT TrackId, Name, MediaTypeId, GenreId, Milliseconds FROM Track WHERE AlbumId = ?");
+        	getSongs = conn.prepareStatement("SELECT TrackId, Name, MediaTypeId, GenreId, Milliseconds, UnitPrice FROM Track WHERE AlbumId = ?");
         	getSongs.setLong(1, albumId);
         	results = getSongs.executeQuery();
         	while(results.next()) {
         		String name = results.getString("Name"),
-        			genre = songDao.getGenre(results.getLong("GenreId")),
-        			mediaType = songDao.getMediaType(results.getLong("MediaTypeId"));
+    				unitPrice = results.getString("UnitPrice");
+        		Genre genre = songDao.getGenre(results.getLong("GenreId"));
+        		MediaType mediaType = songDao.getMediaType(results.getLong("MediaTypeId"));
         		long trackId = results.getLong("TrackId"),
     				songLength = results.getLong("Milliseconds");
-        		Song s = new Song(trackId, name, genre, mediaType, songLength);
-        		songs.add(s);
+        		songs.add(new Song(trackId, name, genre, mediaType, songLength, unitPrice));
         	}
         } catch (SQLException e) {
         	throw new RuntimeException(e);

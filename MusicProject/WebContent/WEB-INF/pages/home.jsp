@@ -23,33 +23,11 @@
 			    </tbody>
 			</table>
 			
-			<p id="loadMore" style="text-align: center; cursor: pointer">Show 25 more</p>
+			<p id="loadMore" style="text-align: center; cursor: pointer">Show more</p>
 		
        		<form style="margin-top: 20px" method="post" action="artist/create">
         		<input type="text" placeholder="Type artist name" name="title" required>
         		<button type="submit"><i class="fas fa-plus fa-fx"></i> Create</button>
         	</form>
-        	
-        	<script>
-
-        		let shownItems = 25,
-        			artists = document.getElementById("artists"),
-        			rows = artists.getElementsByTagName("tr").length,
-        			loadMore = document.getElementById("loadMore");
-        		
-    			loadMore.addEventListener("click", () => {
-    				if(shownItems >= rows) {
-    					loadMore.innerText = "No more results";
-    					return;
-    				}
-    				shownItems = shownItems + 50;
-    				for(let [i,row] of [...artists.rows].entries()) {
-    					if(shownItems >= i) {
-    						row.classList.remove("hidden");
-    					}
-    				}
-    			});
-    			
-        	</script>
         
 <jsp:include page="/WEB-INF/inc/footer.jsp" />    
