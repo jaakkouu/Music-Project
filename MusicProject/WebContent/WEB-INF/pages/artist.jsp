@@ -40,9 +40,9 @@
         		<button type="submit"><i class="fas fa-plus fa-fx"></i> Create</button>
         	</form>
         	
-        	<form method="post" action="artist/favorite">
+        	<form method="post" action="artist/<%= request.getAttribute("favorited").equals("yes") ? "unfavorite" : "favorite" %>" >
         		<input type="hidden" name="artistId" value="<c:out value="${artist.id}" />" />
-        		<button type="submit" class="roundbtn favorite"><i class="far fa-star"></i></button>
+        		<button type="submit" class="roundbtn favorite"><i class="<%= request.getAttribute("favorited").equals("yes") ? "fas" : "far" %> fa-star"></i></button>
         	</form>
         	
         	<button class="roundbtn modify" onclick="window.location.href = 'artist/modify/<c:out value="${artist.id}" />';"><i class="far fa-edit"></i></button>
