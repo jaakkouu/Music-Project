@@ -2,13 +2,15 @@ package model;
 
 public class Song {
 
-    private long id;
+    private long id,
+    	albumId;
     private String name,
 	    songLength,
 	    unitPrice;
     
     private MediaType mediaType;
     private Genre genre;
+	
     
     public Song(long id, String name, Genre genre, MediaType mediaType, long songLength, String UnitPrice) {
         this.setId(id);
@@ -65,11 +67,11 @@ public class Song {
 		return this.songLength;
 	}
 	
-	public String getSongLengthInSeconds() {
+	public long getSongLengthInSeconds() {
 		String[] minutesAndSeconds = this.songLength.split(":");
 		long minutes = Long.parseLong(minutesAndSeconds[0]) * 60;
 		long seconds = Long.parseLong(minutesAndSeconds[1]);
-		return Long.toString(minutes + seconds);
+		return minutes + seconds;
 	}
 
 	public void setSongLength(String songLength) {
@@ -90,6 +92,15 @@ public class Song {
 	
 	public String getUnitPrice() {
 		return this.unitPrice;
+	}
+
+	public void setAlbumId(long albumId) {
+		this.albumId = albumId;
+		
+	}
+	
+	public long getAlbumId() {
+		return this.albumId;
 	}
     
     

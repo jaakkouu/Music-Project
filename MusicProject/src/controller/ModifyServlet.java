@@ -69,27 +69,40 @@ public class ModifyServlet extends HttpServlet {
 	 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    	String servletPath = request.getServletPath();
+    	
+    	String servletPath = request.getServletPath(),
+    			redirectPath = "";
     		
-		if (servletPath.equals("/album/modify")) {			
+		if (servletPath.equals("/album/modify")) {	
+			
+			String name = request.getParameter("title");
+			Long albumId = Long.parseLong(request.getParameter("requestedId"));			
+			albumId = albumDao.modifyAlbumName(albumId, name);
+			redirectPath = request.getContextPath()+"/album/"+albumId;
 
 		} else if (servletPath.equals("/artist/modify")) {
-	
+			
+			String name = request.getParameter("title");
+			Long artistId = Long.parseLong(request.getParameter("requestedId"));			
+			artistId = artistsDao.modifyArtistName(artistId, name);
+			redirectPath = request.getContextPath()+"/artist/"+artistId;
+			
 		} else if (servletPath.equals("/song/modify")) {
 			
 			String name = request.getParameter("title"),
-					unitPrice = request.getParameter("price"),
-					seconds = request.getParameter("length");
-
+					unitPrice = request.getParameter("price");
 			long songId = Long.parseLong(request.getParameter("requestedId")),
 				genreId = Long.parseLong(request.getParameter("genre")),
-				mediaTypeId = Long.parseLong(request.getParameter("mediatype"));
+				mediaTypeId = Long.parseLong(request.getParameter("mediatype")),
+				seconds = Long.parseLong(request.getParameter("length")),
+				albumId = songDao.modifySong(songId, name, genreId, mediaTypeId, seconds, unitPrice);
+			redirectPath = request.getContextPath()+"/album/"+albumId;
 			
-			songId = songDao.modifySong(songId, name, genreId, mediaTypeId, seconds, unitPrice);
-			
-			// Redirect doesnt work properly
-			response.sendRedirect(request.getContextPath()+"/song/"+songId);
+		} else {
+			redirectPath = request.getContextPath()+"/modify/error";
 		}
+		
+		response.sendRedirect(redirectPath);
     }
     
     private List<Object> getInputs(String requestedForm) {
@@ -263,9 +276,9 @@ public class ModifyServlet extends HttpServlet {
     			Input name = new Input("text", "title", "title", song.getName(), "Type a new song name", "Song Name");
     			Select genre = new Select("genre", "genre", song.getGenre().getName(), "Select a new genre name", "Genre");
     			Select mediaType = new Select("mediatype", "mediatype", song.getMediaType().getName(), "Select a new media type", "Media Format");
-    			Input length = new Input("text", "length", "length", song.getSongLengthInSeconds(), "Type a new length it seconds", "Length In Seconds");
-    			Input unitPrice = new Input("text", "price", "price", song.getUnitPrice(), "Type a new unit price (#.##)", "Unit Price");
+    			Input length = new Input("text", "length", "length", Long.toString(song.getSongLengthInSeconds()), "Type a new length it seconds", "Length In Seconds");
     			
+    			Input unitPrice = new Input("text", "price", "price", song.getUnitPrice(), "Type a new unit price (#.##)", "Unit Price (#.##)");
     			unitPrice.setPattern("\\d+(\\.\\d{2})?");
     			
     			inputs.add(name);
@@ -273,7 +286,6 @@ public class ModifyServlet extends HttpServlet {
 				inputs.add(mediaType);
 				inputs.add(length);
 				inputs.add(unitPrice);
-    			
     			break;
     	}
     	

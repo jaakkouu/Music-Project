@@ -9,6 +9,7 @@ import java.util.List;
 
 import database.ChinookDatabase;
 import model.Album;
+import model.Artist;
 import model.Genre;
 import model.MediaType;
 import model.Song;
@@ -40,6 +41,27 @@ public class AlbumDao {
         	db.close(resultSet, getAlbum, conn);
         }
  
+	}
+	
+	public long modifyAlbumName(long albumId, String name) {
+		Connection conn = db.connect();
+        PreparedStatement modifyAlbumName = null;
+        ResultSet rs = null;
+        Album album = getAlbum(albumId);
+        if(album.getName().equals(name) || album.getId() != albumId) {
+        	return album.getId();
+        }
+        try {
+        	modifyAlbumName = conn.prepareStatement("UPDATE Album SET Name = ? WHERE AlbumId = ?"); 
+        	modifyAlbumName.setString(1, name);
+        	modifyAlbumName.setLong(2, album.getId());
+        	modifyAlbumName.executeUpdate();
+     		return album.getId();
+        } catch (SQLException e) {
+        	throw new RuntimeException(e);
+        } finally {
+        	db.close(rs, modifyAlbumName, conn);
+        }           
 	}
 	
 	public List<Song> getSongs(long albumId) {

@@ -16,24 +16,21 @@ public class ArtistsDao {
 	private ChinookDatabase db = new ChinookDatabase();
 	
 	public int createArtist(String artistName) {
-			
-			Connection conn = db.connect();
-	        PreparedStatement createArtist = null;
-	        ResultSet keys = null;
-	        
-	        try {
-	        	createArtist = conn.prepareStatement("INSERT INTO Artist (Name) VALUES (?)");
-	        	createArtist.setString(1, artistName);	
-	        	createArtist.executeUpdate();
-	        	keys = createArtist.getGeneratedKeys();
-	        	keys.next();
-	        	return keys.getInt(1);
-	        } catch (SQLException e) {
-	        	throw new RuntimeException(e);
-	        } finally {
-	        	db.close(keys, createArtist, conn);
-	        }
-			
+		Connection conn = db.connect();
+        PreparedStatement createArtist = null;
+        ResultSet keys = null;
+        try {
+        	createArtist = conn.prepareStatement("INSERT INTO Artist (Name) VALUES (?)");
+        	createArtist.setString(1, artistName);	
+        	createArtist.executeUpdate();
+        	keys = createArtist.getGeneratedKeys();
+        	keys.next();
+        	return keys.getInt(1);
+        } catch (SQLException e) {
+        	throw new RuntimeException(e);
+        } finally {
+        	db.close(keys, createArtist, conn);
+        }
 	}
 	
 	public Artist getArtist(long artistId) {
@@ -74,6 +71,27 @@ public class ArtistsDao {
         }
 	}
 	
+	public long modifyArtistName(long artistId, String name) {
+		Connection conn = db.connect();
+        PreparedStatement modifyArtistName = null;
+        ResultSet rs = null;
+        Artist artist = getArtist(artistId);
+        if(artist.getName().equals(name) || artist.getId() != artistId) {
+        	return artist.getId();
+        }
+        try {
+        	modifyArtistName = conn.prepareStatement("UPDATE Artist SET Name = ? WHERE ArtistId = ?"); 
+        	modifyArtistName.setString(1, name);
+        	modifyArtistName.setLong(2, artist.getId());
+        	modifyArtistName.executeUpdate();
+     		return artist.getId();
+        } catch (SQLException e) {
+        	throw new RuntimeException(e);
+        } finally {
+        	db.close(rs, modifyArtistName, conn);
+        }           
+	}
+	
 	public List<Artist> getArtists() {
 		Connection conn = db.connect();
         PreparedStatement getAllArtists = null;
@@ -94,7 +112,6 @@ public class ArtistsDao {
         	db.close(results, getAllArtists, conn);
         }
         return artists;
-       
 	}
 	
 	public List<Artist> searchArtists(String searchString) {

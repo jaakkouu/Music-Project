@@ -25,7 +25,7 @@ public class SongDao {
         ResultSet results = null;
         
         try {
-        	getSong = conn.prepareStatement("SELECT TrackId, Name, MediaTypeId, GenreId, Milliseconds, UnitPrice FROM Track WHERE TrackId = ?");
+        	getSong = conn.prepareStatement("SELECT TrackId, Name, MediaTypeId, GenreId, Milliseconds, UnitPrice, AlbumId FROM Track WHERE TrackId = ?");
         	getSong.setLong(1, songId);
         	results = getSong.executeQuery();
         	if(results.next()){
@@ -34,8 +34,11 @@ public class SongDao {
             	Genre genre = getGenre(results.getLong("GenreId"));
             	MediaType mediaType = getMediaType(results.getLong("MediaTypeId"));
         		long trackId = results.getLong("TrackId"),
-    				songLength = results.getLong("Milliseconds");
-        		return new Song(trackId, name, genre, mediaType, songLength, unitPrice);
+    				songLength = results.getLong("Milliseconds"),
+    				albumId = results.getLong("AlbumId");
+        		Song a = new Song(trackId, name, genre, mediaType, songLength, unitPrice);
+        		a.setAlbumId(albumId);
+        		return a;
         	} else {
         		return null;
         	}
@@ -112,8 +115,8 @@ public class SongDao {
 	}
 	
 	
-	public int modifySong(long songId, String name, long genreId, long mediaTypeId, String seconds, String unitPrice) {
-		
+	// Tajusin liian myöhään, että tässä olisi voinut hyödyntää stmt.setObject
+	public long modifySong(long songId, String name, long genreId, long mediaTypeId, long seconds, String unitPrice) {
 		
 		Connection conn = db.connect();
         PreparedStatement modifySong = null;
@@ -125,7 +128,7 @@ public class SongDao {
         // Update only if changed data is different
         String sql = "UPDATE Track SET";
         
-        Map<String, List<String>> parameters = new HashMap();
+        Map<String, List<String>> parameters = new HashMap<>();
         
         if(!song.getName().equals(name)) {
         	List<String> a = new ArrayList<>();
@@ -148,10 +151,11 @@ public class SongDao {
         	parameters.put("Long", a);
         }
         
-        if(!song.getSongLengthInSeconds().equals(seconds)) {
+        if(song.getSongLengthInSeconds() != seconds) {
+        	String milliSeconds = Long.toString(song.secondsInMilliseconds(seconds));
         	List<String> a = new ArrayList<>();
         	a.add("MilliSeconds");
-        	a.add(seconds);
+        	a.add(milliSeconds);
         	parameters.put("Long", a);
         }
         
@@ -170,24 +174,28 @@ public class SongDao {
           sql = sql.substring(0, sql.length() - 1);
         }
         
+        sql += " WHERE TrackId = ?";
+        
+        // If no changes
+        if(parameters.size() == 0) {
+        	System.out.println("No changes made");
+        	return song.getAlbumId();
+        }
+        
         try {
-        	modifySong = conn.prepareStatement(sql + "WHERE TrackId = ?"); 
+        	modifySong = conn.prepareStatement(sql); 
             int position = 1;
             for (Map.Entry<String, List<String>> p : parameters.entrySet()) {	
             	if(p.getKey().equals("String")) {
             		modifySong.setString(position, p.getValue().get(1));
-            		System.out.println(position + " " + p.getValue().get(1));
             	} else if (p.getKey().equals("Long")) {
             		modifySong.setLong(position, Long.parseLong(p.getValue().get(1)));
-            		System.out.println(position + " " + Long.parseLong(p.getValue().get(1)));
             	}
             	position++;
             }
             modifySong.setLong(position, songId);
             modifySong.executeUpdate();
-        	keys = modifySong.getGeneratedKeys();
-        	keys.next();
-     		return keys.getInt(1);
+     		return song.getAlbumId();
         } catch (SQLException e) {
         	throw new RuntimeException(e);
         } finally {
@@ -209,7 +217,6 @@ public class SongDao {
         } finally {
         	db.close(resultSet, removeSong, conn);
         }
-
 	}
 	
 	public Genre getGenre(long genreId) {
